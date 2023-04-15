@@ -45,6 +45,19 @@
 # Kernel Module Compile Results
 *.mod*
 *.cmd
+ODVI_0.2/.detect_images
+ODVI_0.2/frame_images
+ODVI_0.2/bs_Images
+*.jpg
+*.jpg
+ODVI_0.2/bs_Images/BS1100.jpg
+ODVI_0.2/runs/detect/
+ODVI_0.2/frame_images/self.frame276.jpg
+C:\Users\Arcti\PycharmProjects\FYPrepo2\ODVI_0.2\detect_images
+C:\Users\Arcti\PycharmProjects\FYPrepo2\ODVI_0.2\frame_images
+C:\Users\Arcti\PycharmProjects\FYPrepo2\ODVI_0.2\bs_Images
+*.jpg
+
 .tmp_versions/
 modules.order
 Module.symvers
