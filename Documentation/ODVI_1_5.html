@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ODVI_1_5 module &mdash; ODVI 0.1.5 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ODVI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">ODVI_1_5 module</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ODVI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">ODVI_1_5 module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ODVI_1_5.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-ODVI_1_5">
+<span id="odvi-1-5-module"></span><h1>ODVI_1_5 module<a class="headerlink" href="#module-ODVI_1_5" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="ODVI_1_5.ODVI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ODVI_1_5.</span></span><span class="sig-name descname"><span class="pre">ODVI</span></span><a class="reference internal" href="_modules/ODVI_1_5.html#ODVI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ODVI_1_5.ODVI" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ODVI_1_5.ODVI.alertUser">
+<span class="sig-name descname"><span class="pre">alertUser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ODVI_1_5.html#ODVI.alertUser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ODVI_1_5.ODVI.alertUser" title="Permalink to this definition"></a></dt>
+<dd><p>Loop for allerting user of hazards</p>
+<p>if detection is the same as the last play tone, 
+otherwise start tts thread based on the direction of the object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ODVI_1_5.ODVI.customTrack">
+<span class="sig-name descname"><span class="pre">customTrack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ODVI_1_5.html#ODVI.customTrack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ODVI_1_5.ODVI.customTrack" title="Permalink to this definition"></a></dt>
+<dd><p>Custom tracker used to track objects.</p>
+<p>loops through new object detections and compares to existing tracks, 
+if not found they are added to the track list. Otherwise their detection count 
+is increased and if over 4 and close enough an alert is created.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ODVI_1_5.ODVI.detectAndTrack">
+<span class="sig-name descname"><span class="pre">detectAndTrack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">showImg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detSource</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ODVI_1_5.html#ODVI.detectAndTrack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ODVI_1_5.ODVI.detectAndTrack" title="Permalink to this definition"></a></dt>
+<dd><p>Detection and tracking of input video stream</p>
+<p>Takes an input source, if its not 0 or 1 the test video will be used.
+Detection and tracking with the custom yolov8 data set will then loop for 
+each frame in an open cv live video stream, with custom track being called
+if a detection is found.</p>
+<dl class="simple">
+<dt>Args: </dt><dd><p>arg1:   show image Boolean
+arg2:   detection source</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ODVI_1_5.ODVI.outImage">
+<span class="sig-name descname"><span class="pre">outImage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ODVI_1_5.html#ODVI.outImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ODVI_1_5.ODVI.outImage" title="Permalink to this definition"></a></dt>
+<dd><p>Outputs the test display to the user.</p>
+<p>Formats the detection bounding box, while using supervison annotation
+to apply object names confidance and track ids.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ODVI_1_5.ODVI.playTone">
+<span class="sig-name descname"><span class="pre">playTone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inFrequency</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ODVI_1_5.html#ODVI.playTone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ODVI_1_5.ODVI.playTone" title="Permalink to this definition"></a></dt>
+<dd><p>Plays a directional tone</p>
+<p>normalised between 0 and 1 and then 1 to -1, this is in order
+to format the input for paning between the left and right channel.
+This input is then multiplied to put it into a comfortable hearing range,
+before constructing and playing a pyaudio stream and playing the tone for the user.</p>
+<dl class="simple">
+<dt>Args: </dt><dd><p>arg1:   Object center position</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ODVI_1_5.ODVI.ttsOut">
+<span class="sig-name descname"><span class="pre">ttsOut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outText</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ODVI_1_5.html#ODVI.ttsOut"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ODVI_1_5.ODVI.ttsOut" title="Permalink to this definition"></a></dt>
+<dd><p>Text to speech output of object names and direction</p>
+<dl class="simple">
+<dt>Args: </dt><dd><p>arg1:   obj name and direction</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ODVI_1_5.objDistance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ODVI_1_5.</span></span><span class="sig-name descname"><span class="pre">objDistance</span></span><a class="reference internal" href="_modules/ODVI_1_5.html#objDistance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ODVI_1_5.objDistance" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ODVI_1_5.objDistance.isClose">
+<span class="sig-name descname"><span class="pre">isClose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trackedObject</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ODVI_1_5.html#objDistance.isClose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ODVI_1_5.objDistance.isClose" title="Permalink to this definition"></a></dt>
+<dd><p>Checks for object distance</p>
+<p>Takes in the tracked object and compares it width and height
+to the minimum required for detection.If this is met its area
+of the screen will be appended and true will be returned.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>arg1:   tracked object to compare</p>
+</dd>
+<dt>Returns:</dt><dd><p>True or False</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, James Corbett.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,20 +1,13 @@
 from __future__ import print_function
 import cv2 as cv
-#import detect
 import time
-#import tensorflow as tf
 import sys
 import pyttsx3
-from sys import exit
 import supervision as sv
 from threading import Thread
-from gtts import gTTS
-from pysine import sine
 import numpy as np
-from time import sleep
 import pyaudio
 from ultralytics import YOLO
-import playsound
 import os
 
     
@@ -46,10 +39,21 @@ class ODVI:
              )
          self.formatedYoloRes = []
          self.objClass =[]
-         self.model = YOLO("200epc15k.pt")  # load a pretrained YOLOv8n model
+         self.model = YOLO("16kbest.pt")  # load a pretrained YOLOv8n model
          self.detectionClasses = ['Construction-barrier', 'Construction-sign', 'bin', 'bollard', 'car', 'cone', 'puddle', 'street-pole', 'street-sign', 'tree']
   
       def playTone(self,inFrequency):
+          """
+          Plays a directional tone
+          
+          normalised between 0 and 1 and then 1 to -1, this is in order
+          to format the input for paning between the left and right channel.
+          This input is then multiplied to put it into a comfortable hearing range,
+          before constructing and playing a pyaudio stream and playing the tone for the user.
+          
+          Args: 
+              arg1:   Object center position
+          """
           duration = 0.6
           
           normFreq = inFrequency / 640 # normalise between 0 and 1
@@ -72,12 +76,25 @@ class ODVI:
           ##sine(frequency=outFrequency, duration=0.2)
           
         
-      def ttsOut(self,outText):
+      def ttsOut(self,outText): 
+          """
+          Text to speech output of object names and direction
+          
+          Args: 
+              arg1:   obj name and direction
+          """
           self.engine.say(outText)
           self.engine.runAndWait()
           
           
-      def outImage(self):
+      def outImage(self): 
+          """
+          Outputs the test display to the user.
+          
+          Formats the detection bounding box, while using supervison annotation
+          to apply object names confidance and track ids.
+          Note ultralytics version ultralytics==8.0.68 required.
+          """
           for item in self.yoloResults:
               if self.result.boxes.id is not None:
                   self.yoloResults.tracker_id = self.result.boxes.id.cpu().numpy().astype(int)
@@ -92,12 +109,26 @@ class ODVI:
           cv.imshow("yolo",self.frame)
           
         
-      def detectAndTrack(self,showImg,detSource): #manages what process runs when 
-          if detSource != "0":
+      def detectAndTrack(self,showImg,detSource): 
+          """
+          Detection and tracking of input video stream
+          
+          Takes an input source, if its not 0 or 1 the test video will be used.
+          Detection and tracking with the custom yolov8 data set will then loop for 
+          each frame in an open cv live video stream, with custom track being called
+          if a detection is found.
+          
+          
+          Args: 
+              arg1:   show image Boolean
+              arg2:   detection source
+          
+          """
+          if detSource != "0" or "1":
               detSource = self.testVideo
           run = True        
           while run == True:
-              for self.result in  self.model.track(source= detSource,imgsz=640,stream=True,save = True):##save = True):
+              for self.result in  self.model.track(source= detSource,imgsz=640,stream=True):
                   self.yoloResults =""
                   self.formattedResults.clear()
                   self.frame = self.result.orig_img
@@ -124,7 +155,15 @@ class ODVI:
                   keyboard = cv.waitKey(30)
               
       
-      def customTrack(self):# loops through new object detections and compares to existing tracks, if not found they are added to the track list. Otherwise their detection count is increased and if over 4 and close enough an alert is created.
+      def customTrack(self):
+          """
+          Custom tracker used to track objects.
+      
+          loops through new object detections and compares to existing tracks, 
+          if not found they are added to the track list. Otherwise their detection count 
+          is increased and if over 4 and close enough an alert is created.
+      
+          """
           self.alertQueue.clear()
           print(self.formattedResults)
           for formatItem in self.formattedResults: 
@@ -140,10 +179,9 @@ class ODVI:
                      else:
                          trackedItem[4] = trackedItem[4] +1
                          
-                         if(trackedItem[4] >4 and self.od.isClose(index,self.trackedObjects)):
+                         if(trackedItem[4] >4 and self.od.isClose(trackedItem)):
                              if(len(trackedItem) ==6):
                                  trackedItem.append(1)
-                                 print("ello")
                                  alertItem = trackedItem
                                  alertItem.append(self.od.alertItemPos)
                                  self.alertQueue.append(alertItem)
@@ -161,7 +199,14 @@ class ODVI:
                      
                      
           
-      def alertUser(self):# if detection is the same as the last play tone, otherwise start tts thread.
+      def alertUser(self):
+          """
+          Loop for allerting user of hazards
+          
+          if detection is the same as the last play tone, 
+          otherwise start tts thread based on the direction of the object.
+          
+          """
           for item in self.alertQueue:
               if(self.lastDetection == item[0]):
                  self.playTone(item[7])
@@ -211,78 +256,90 @@ class objDistance:
         self.treeHeight=300
               
               
-    def isClose(self,index,trackedObjects):
+    def isClose(self,trackedObject):
+        """
+        Checks for object distance
         
-        print("to",trackedObjects[0])
-        centerPos = trackedObjects[index][1][0] +(abs(trackedObjects[index][1][0] -trackedObjects[index][1][2])/2)
+        Takes in the tracked object and compares it width and height
+        to the minimum required for detection.If this is met its area
+        of the screen will be appended and true will be returned.
+        
+        Args:
+            arg1:   tracked object to compare
+        
+        Returns:
+            True or False
+        """
+        
+        print("to",trackedObject)
+        centerPos = trackedObject[1][0] +(abs(trackedObject[1][0] -trackedObject[1][2])/2)
         self.alertItemPos = centerPos
-        objWidth = abs(trackedObjects[index][1][0] - trackedObjects[index][1][2])
-        objHeight = trackedObjects[index][1][3]
+        objectName = trackedObject[0]
+        objWidth = abs(trackedObject[1][0] - trackedObject[1][2])
+        objHeight = trackedObject[1][3]
         close = False
         
-        if(trackedObjects[index][0] == 'bollard'):
+        if(objectName == 'bollard'):
             if( objWidth > self.bollardWidth and objHeight > self.bollardHeight):
-                if(len(trackedObjects[index]) ==5): 
+                if(len(trackedObject) ==5): 
                     close = True
         
-        elif(trackedObjects[index][0] == 'Construction-sign'):
+        elif(objectName == 'Construction-sign'):
             if( objWidth > self.constructionSignWidth):
-                if(len(trackedObjects[index]) ==5): 
+                if(len(trackedObject) ==5): 
                     close = True
             
             
-        elif(trackedObjects[index][0] == 'Construction-barrier'):
+        elif(objectName == 'Construction-barrier'):
             if( objHeight > self.constructionBarrierHeight and objWidth >self.constructionBarrierWidth):
-                if(len(trackedObjects[index]) ==5): 
+                if(len(trackedObject) ==5): 
                     close = True
                     
-                    
-        elif(trackedObjects[index][0] == 'cone'):
+        elif(objectName == 'cone'):
             if( objWidth > self.coneWidth):
-                if(len(trackedObjects[index]) ==5): 
+                if(len(trackedObject) ==5): 
                     close = True
              
-        elif(trackedObjects[index][0] == 'bin'):
+        elif(objectName == 'bin'):
             if( objWidth > self.binWidth ):
-                if(len(trackedObjects[index]) ==5): 
+                if(len(trackedObject) ==5): 
                     close = True
             
-        
-        elif(trackedObjects[index][0] == 'car'):
+        elif(objectName == 'car'):
             if( objWidth > self.carWidth):
-                if(len(trackedObjects[index]) ==5):
+                if(len(trackedObject) ==5):
                     close = True
        
-        elif(trackedObjects[index][0] == 'puddle'):
-            if( objHeight > self.puddleHeight and objWidth > self.puddleWidth):
-                if(len(trackedObjects[index]) ==5):
-                    close = True
+       # elif(objectName == 'puddle'):
+       #     if( objHeight > self.puddleHeight and objWidth > self.puddleWidth):
+       #         if(len(trackedObject) ==5):
+       #             close = True
         
-        elif(trackedObjects[index][0] == 'street-pole'):
+        elif(objectName == 'street-pole'):
             if( objHeight > self.streetPoleHeight and objWidth > self.streetPoleWidth):
-                if(len(trackedObjects[index]) ==5): 
+                if(len(trackedObject) ==5): 
                     close = True
             
-        elif(trackedObjects[index][0] == 'street-sign'):
+        elif(objectName == 'street-sign'):
             if( objHeight > self.streetSignHeight and objWidth > self.streetSignWidth):
-                if(len(trackedObjects[index]) ==5): 
+                if(len(trackedObject) ==5): 
                     close = True
                     
-        elif(trackedObjects[index][0] == 'tree'):
+        elif(objectName == 'tree'):
             if( objHeight > self.treeHeight and objWidth > self.treeWidth):
-                if(len(trackedObjects[index]) ==5): 
+                if(len(trackedObject) ==5): 
                     close = True
         
         if(close):
             print("center Position =", centerPos)
             if(centerPos <= 180 ):
-                trackedObjects[index].append("left")
+                trackedObject.append("left")
             
             if(centerPos > 180  and centerPos <460):
-                trackedObjects[index].append("forward")
+                trackedObject.append("forward")
             
             elif(centerPos >= 460):
-                trackedObjects[index].append("right")
+                trackedObject.append("right")
             return True
         else:
             return False

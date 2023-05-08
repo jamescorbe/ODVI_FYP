@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ODVI_1_5 &mdash; ODVI 0.1.5 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            ODVI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ODVI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ODVI_1_5</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ODVI_1_5</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">cv2</span> <span class="k">as</span> <span class="nn">cv</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">pyttsx3</span>
+<span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">exit</span>
+<span class="kn">import</span> <span class="nn">supervision</span> <span class="k">as</span> <span class="nn">sv</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<span class="kn">from</span> <span class="nn">gtts</span> <span class="kn">import</span> <span class="n">gTTS</span>
+<span class="kn">from</span> <span class="nn">pysine</span> <span class="kn">import</span> <span class="n">sine</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">import</span> <span class="nn">pyaudio</span>
+<span class="kn">from</span> <span class="nn">ultralytics</span> <span class="kn">import</span> <span class="n">YOLO</span>
+<span class="kn">import</span> <span class="nn">playsound</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+    
+<div class="viewcode-block" id="ODVI"><a class="viewcode-back" href="../ODVI_1_5.html#ODVI_1_5.ODVI">[docs]</a><span class="k">class</span> <span class="nc">ODVI</span><span class="p">:</span>
+    
+      <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;KMP_DUPLICATE_LIB_OK&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;TRUE&quot;</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">od</span> <span class="o">=</span> <span class="n">objDistance</span><span class="p">()</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span><span class="kc">None</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">lastID</span> <span class="o">=</span><span class="kc">None</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">_count_</span> <span class="o">=</span> <span class="mi">0</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">pyttsx3</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">voice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">getProperty</span><span class="p">(</span><span class="s1">&#39;voices&#39;</span><span class="p">)</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">setProperty</span><span class="p">(</span><span class="s2">&quot;voice&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">voice</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">yoloResults</span> <span class="o">=</span> <span class="p">[]</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">formattedResults</span> <span class="o">=</span><span class="p">[]</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">alertQueue</span> <span class="o">=</span><span class="p">[]</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">trackedObjects</span> <span class="o">=</span><span class="p">[[</span><span class="s1">&#39;&#39;</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]]</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">yoloRun</span> <span class="o">=</span> <span class="mi">0</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">lastDetection</span> <span class="o">=</span><span class="s2">&quot;&quot;</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">workingDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">frameImages</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workingDir</span><span class="p">,</span><span class="s1">&#39;frame_images&#39;</span><span class="p">)</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">testVideo</span> <span class="o">=</span>  <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workingDir</span><span class="p">,</span><span class="s1">&#39;detect_day_2_e.mp4&#39;</span><span class="p">)</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">boxAnnotator</span> <span class="o">=</span> <span class="n">sv</span><span class="o">.</span><span class="n">BoxAnnotator</span><span class="p">(</span>
+             <span class="n">thickness</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+             <span class="n">text_thickness</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+             <span class="n">text_scale</span><span class="o">=</span><span class="mf">0.5</span>
+             <span class="p">)</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">formatedYoloRes</span> <span class="o">=</span> <span class="p">[]</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">objClass</span> <span class="o">=</span><span class="p">[]</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">YOLO</span><span class="p">(</span><span class="s2">&quot;200epc15k.pt&quot;</span><span class="p">)</span>  <span class="c1"># load a pretrained YOLOv8n model</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">detectionClasses</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Construction-barrier&#39;</span><span class="p">,</span> <span class="s1">&#39;Construction-sign&#39;</span><span class="p">,</span> <span class="s1">&#39;bin&#39;</span><span class="p">,</span> <span class="s1">&#39;bollard&#39;</span><span class="p">,</span> <span class="s1">&#39;car&#39;</span><span class="p">,</span> <span class="s1">&#39;cone&#39;</span><span class="p">,</span> <span class="s1">&#39;puddle&#39;</span><span class="p">,</span> <span class="s1">&#39;street-pole&#39;</span><span class="p">,</span> <span class="s1">&#39;street-sign&#39;</span><span class="p">,</span> <span class="s1">&#39;tree&#39;</span><span class="p">]</span>
+  
+<div class="viewcode-block" id="ODVI.playTone"><a class="viewcode-back" href="../ODVI_1_5.html#ODVI_1_5.ODVI.playTone">[docs]</a>      <span class="k">def</span> <span class="nf">playTone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">inFrequency</span><span class="p">):</span>
+          <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">          Plays a directional tone</span>
+<span class="sd">          </span>
+<span class="sd">          normalised between 0 and 1 and then 1 to -1, this is in order</span>
+<span class="sd">          to format the input for paning between the left and right channel.</span>
+<span class="sd">          This input is then multiplied to put it into a comfortable hearing range,</span>
+<span class="sd">          before constructing and playing a pyaudio stream and playing the tone for the user.</span>
+<span class="sd">          </span>
+<span class="sd">          Args: </span>
+<span class="sd">              arg1:   Object center position</span>
+<span class="sd">          &quot;&quot;&quot;</span>
+          <span class="n">duration</span> <span class="o">=</span> <span class="mf">0.6</span>
+          
+          <span class="n">normFreq</span> <span class="o">=</span> <span class="n">inFrequency</span> <span class="o">/</span> <span class="mi">640</span> <span class="c1"># normalise between 0 and 1</span>
+          <span class="n">normFreq</span> <span class="o">=</span> <span class="p">(</span><span class="n">normFreq</span><span class="o">*</span><span class="mi">2</span> <span class="p">)</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># normalise between -1 and 1</span>
+          
+          <span class="n">outFrequency</span> <span class="o">=</span> <span class="n">normFreq</span> <span class="o">*</span> <span class="mi">5000</span>
+          <span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">duration</span> <span class="o">*</span> <span class="mi">44100</span><span class="p">)</span>
+          <span class="n">waveform</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">outFrequency</span> <span class="o">*</span> <span class="n">samples</span> <span class="o">/</span> <span class="mi">44100</span><span class="p">)</span>
+        
+          <span class="n">p</span> <span class="o">=</span> <span class="n">pyaudio</span><span class="o">.</span><span class="n">PyAudio</span><span class="p">()</span>
+          <span class="n">stream</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="n">pyaudio</span><span class="o">.</span><span class="n">paFloat32</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+          <span class="n">left</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">normFreq</span><span class="p">)</span> <span class="o">/</span><span class="mi">2</span>
+          <span class="n">right</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">normFreq</span><span class="p">)</span> <span class="o">/</span><span class="mi">2</span>
+          <span class="n">stereo_sound</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">waveform</span> <span class="o">*</span> <span class="n">left</span><span class="p">,</span> <span class="n">waveform</span> <span class="o">*</span> <span class="n">right</span><span class="p">))</span>
+          <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">stereo_sound</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
+          <span class="n">stream</span><span class="o">.</span><span class="n">stop_stream</span><span class="p">()</span>
+          <span class="n">stream</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+          <span class="n">p</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span></div>
+    
+          <span class="c1">##sine(frequency=outFrequency, duration=0.2)</span>
+          
+        
+<div class="viewcode-block" id="ODVI.ttsOut"><a class="viewcode-back" href="../ODVI_1_5.html#ODVI_1_5.ODVI.ttsOut">[docs]</a>      <span class="k">def</span> <span class="nf">ttsOut</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">outText</span><span class="p">):</span> 
+          <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">          Text to speech output of object names and direction</span>
+<span class="sd">          </span>
+<span class="sd">          Args: </span>
+<span class="sd">              arg1:   obj name and direction</span>
+<span class="sd">          &quot;&quot;&quot;</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">outText</span><span class="p">)</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">runAndWait</span><span class="p">()</span></div>
+          
+          
+<div class="viewcode-block" id="ODVI.outImage"><a class="viewcode-back" href="../ODVI_1_5.html#ODVI_1_5.ODVI.outImage">[docs]</a>      <span class="k">def</span> <span class="nf">outImage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+          <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">          Outputs the test display to the user.</span>
+<span class="sd">          </span>
+<span class="sd">          Formats the detection bounding box, while using supervison annotation</span>
+<span class="sd">          to apply object names confidance and track ids.</span>
+<span class="sd">          &quot;&quot;&quot;</span>
+          <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">yoloResults</span><span class="p">:</span>
+              <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">boxes</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">yoloResults</span><span class="o">.</span><span class="n">tracker_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">boxes</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+          
+          <span class="n">yoloLabels</span> <span class="o">=</span><span class="p">[</span>
+                <span class="sa">f</span><span class="s2">&quot;#</span><span class="si">{</span><span class="n">tracker_id</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="n">class_id</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">confidence</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">confidence</span><span class="p">,</span><span class="n">class_id</span><span class="p">,</span><span class="n">tracker_id</span>
+                <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">yoloResults</span>
+          
+                <span class="p">]</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boxAnnotator</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">scene</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">detections</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yoloResults</span><span class="p">,</span><span class="n">labels</span><span class="o">=</span><span class="n">yoloLabels</span><span class="p">)</span>
+          <span class="n">cv</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;yolo&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">)</span></div>
+          
+        
+<div class="viewcode-block" id="ODVI.detectAndTrack"><a class="viewcode-back" href="../ODVI_1_5.html#ODVI_1_5.ODVI.detectAndTrack">[docs]</a>      <span class="k">def</span> <span class="nf">detectAndTrack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">showImg</span><span class="p">,</span><span class="n">detSource</span><span class="p">):</span> 
+          <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">          Detection and tracking of input video stream</span>
+<span class="sd">          </span>
+<span class="sd">          Takes an input source, if its not 0 or 1 the test video will be used.</span>
+<span class="sd">          Detection and tracking with the custom yolov8 data set will then loop for </span>
+<span class="sd">          each frame in an open cv live video stream, with custom track being called</span>
+<span class="sd">          if a detection is found.</span>
+<span class="sd">          </span>
+<span class="sd">          </span>
+<span class="sd">          Args: </span>
+<span class="sd">              arg1:   show image Boolean</span>
+<span class="sd">              arg2:   detection source</span>
+<span class="sd">          </span>
+<span class="sd">          &quot;&quot;&quot;</span>
+          <span class="k">if</span> <span class="n">detSource</span> <span class="o">!=</span> <span class="s2">&quot;0&quot;</span> <span class="ow">or</span> <span class="s2">&quot;1&quot;</span><span class="p">:</span>
+              <span class="n">detSource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">testVideo</span>
+          <span class="n">run</span> <span class="o">=</span> <span class="kc">True</span>        
+          <span class="k">while</span> <span class="n">run</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+              <span class="k">for</span> <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="ow">in</span>  <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">track</span><span class="p">(</span><span class="n">source</span><span class="o">=</span> <span class="n">detSource</span><span class="p">,</span><span class="n">imgsz</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span><span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">save</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span><span class="c1">##save = True):</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">yoloResults</span> <span class="o">=</span><span class="s2">&quot;&quot;</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">formattedResults</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">orig_img</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">yoloResults</span> <span class="o">=</span> <span class="n">sv</span><span class="o">.</span><span class="n">Detections</span><span class="o">.</span><span class="n">from_yolov8</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
+                  
+                  <span class="k">if</span><span class="p">(</span><span class="n">showImg</span><span class="p">):</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">outImage</span><span class="p">()</span>
+                  
+                  <span class="k">for</span> <span class="n">xyxy</span><span class="p">,</span> <span class="n">confidence</span><span class="p">,</span> <span class="n">class_id</span><span class="p">,</span> <span class="n">tracker_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">yoloResults</span><span class="p">:</span>
+                      <span class="n">resultFormat</span> <span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="n">class_id</span><span class="p">],[</span><span class="n">xyxy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">xyxy</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">xyxy</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">xyxy</span><span class="p">[</span><span class="mi">3</span><span class="p">]],</span><span class="n">confidence</span><span class="p">,</span><span class="n">tracker_id</span><span class="p">]</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">formattedResults</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resultFormat</span><span class="p">)</span>
+
+        
+                  <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yoloResults</span><span class="p">)</span> <span class="o">&gt;</span><span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yoloResults</span><span class="p">)</span> <span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">yoloResults</span><span class="o">.</span><span class="n">tracker_id</span>  <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lastID</span><span class="p">):</span> <span class="c1">#checc</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">customTrack</span><span class="p">()</span>
+                      
+                      
+                      
+                  <span class="n">k</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
+                  <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">):</span>
+                      <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+                  
+                  <span class="n">cv</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                  <span class="n">keyboard</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span></div>
+              
+      
+<div class="viewcode-block" id="ODVI.customTrack"><a class="viewcode-back" href="../ODVI_1_5.html#ODVI_1_5.ODVI.customTrack">[docs]</a>      <span class="k">def</span> <span class="nf">customTrack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+          <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">          Custom tracker used to track objects.</span>
+<span class="sd">      </span>
+<span class="sd">          loops through new object detections and compares to existing tracks, </span>
+<span class="sd">          if not found they are added to the track list. Otherwise their detection count </span>
+<span class="sd">          is increased and if over 4 and close enough an alert is created.</span>
+<span class="sd">      </span>
+<span class="sd">          &quot;&quot;&quot;</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">alertQueue</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+          <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formattedResults</span><span class="p">)</span>
+          <span class="k">for</span> <span class="n">formatItem</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">formattedResults</span><span class="p">:</span> 
+             <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+             <span class="k">for</span> <span class="n">index</span><span class="p">,</span><span class="n">trackedItem</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trackedObjects</span><span class="p">):</span>
+                 <span class="k">if</span> <span class="p">(</span><span class="n">formatItem</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="n">trackedItem</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">and</span> <span class="n">formatItem</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+                     <span class="n">trackedItem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatItem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                     <span class="n">trackedItem</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatItem</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                     <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                     <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trackedItem</span><span class="p">)</span> <span class="o">==</span><span class="mi">4</span><span class="p">):</span>
+                         <span class="n">trackedItem</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                         
+                     <span class="k">else</span><span class="p">:</span>
+                         <span class="n">trackedItem</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">trackedItem</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span><span class="mi">1</span>
+                         
+                         <span class="k">if</span><span class="p">(</span><span class="n">trackedItem</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&gt;</span><span class="mi">4</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">od</span><span class="o">.</span><span class="n">isClose</span><span class="p">(</span><span class="n">trackedItem</span><span class="p">)):</span>
+                             <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trackedItem</span><span class="p">)</span> <span class="o">==</span><span class="mi">6</span><span class="p">):</span>
+                                 <span class="n">trackedItem</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ello&quot;</span><span class="p">)</span>
+                                 <span class="n">alertItem</span> <span class="o">=</span> <span class="n">trackedItem</span>
+                                 <span class="n">alertItem</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">od</span><span class="o">.</span><span class="n">alertItemPos</span><span class="p">)</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">alertQueue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alertItem</span><span class="p">)</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">lastID</span> <span class="o">=</span><span class="n">alertItem</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">alertUser</span><span class="p">()</span>
+                             <span class="k">else</span><span class="p">:</span>
+                                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;tracked item&quot;</span><span class="p">,</span><span class="n">trackedItem</span><span class="p">)</span>
+                                 <span class="n">trackedItem</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span><span class="mi">1</span>
+                                 
+                             
+             <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">found</span> <span class="ow">and</span> <span class="n">formatItem</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">trackedObjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">formatItem</span><span class="p">)</span></div>
+         
+                     
+                     
+                     
+          
+<div class="viewcode-block" id="ODVI.alertUser"><a class="viewcode-back" href="../ODVI_1_5.html#ODVI_1_5.ODVI.alertUser">[docs]</a>      <span class="k">def</span> <span class="nf">alertUser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+          <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">          Loop for allerting user of hazards</span>
+<span class="sd">          </span>
+<span class="sd">          if detection is the same as the last play tone, </span>
+<span class="sd">          otherwise start tts thread based on the direction of the object.</span>
+<span class="sd">          </span>
+<span class="sd">          &quot;&quot;&quot;</span>
+          <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alertQueue</span><span class="p">:</span>
+              <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lastDetection</span> <span class="o">==</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">playTone</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
+                 <span class="k">break</span>
+                                                                                                                                                                                                                                                                                                      
+              <span class="k">if</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;forward&#39;</span><span class="p">):</span>
+                  <span class="n">speech</span><span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s2">&quot; ahead&quot;</span>
+                  <span class="n">thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">ttsOut</span><span class="p">(</span><span class="n">speech</span><span class="p">),</span> <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">speech</span><span class="p">))</span>
+                  <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">lastDetection</span> <span class="o">=</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                  
+              <span class="k">else</span><span class="p">:</span>
+                  <span class="n">speech</span><span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s2">&quot; on the &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">lastDetection</span> <span class="o">=</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                  <span class="n">thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttsOut</span><span class="p">(</span><span class="n">speech</span><span class="p">)</span> <span class="p">,</span><span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">speech</span><span class="p">))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div></div>
+                  
+                  
+              
+              
+              
+         
+                     
+                         
+                
+<div class="viewcode-block" id="objDistance"><a class="viewcode-back" href="../ODVI_1_5.html#ODVI_1_5.objDistance">[docs]</a><span class="k">class</span> <span class="nc">objDistance</span><span class="p">:</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">streetPoleWidth</span> <span class="o">=</span><span class="mi">20</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">streetPoleHeight</span><span class="o">=</span><span class="mi">300</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">streetSignWidth</span><span class="o">=</span><span class="mi">15</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alertItemPos</span> <span class="o">=</span><span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">streetSignHeight</span><span class="o">=</span><span class="mi">250</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">carWidth</span> <span class="o">=</span><span class="mi">90</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">carHeight</span> <span class="o">=</span><span class="mi">350</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constructionBarrierWidth</span><span class="o">=</span><span class="mi">80</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constructionBarrierHeight</span><span class="o">=</span><span class="mi">350</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constructionSignWidth</span> <span class="o">=</span> <span class="mi">72</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">binWidth</span> <span class="o">=</span><span class="mi">110</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">binHeight</span> <span class="o">=</span><span class="mi">260</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bollardWidth</span> <span class="o">=</span><span class="mi">14</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bollardHeight</span> <span class="o">=</span><span class="mi">200</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coneWidth</span><span class="o">=</span><span class="mf">32.2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">puddleWidth</span><span class="o">=</span><span class="mi">244</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">puddleHeight</span><span class="o">=</span><span class="mi">290</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lastDetection</span> <span class="o">=</span><span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">treeWidth</span><span class="o">=</span><span class="mi">60</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">treeHeight</span><span class="o">=</span><span class="mi">300</span>
+              
+              
+<div class="viewcode-block" id="objDistance.isClose"><a class="viewcode-back" href="../ODVI_1_5.html#ODVI_1_5.objDistance.isClose">[docs]</a>    <span class="k">def</span> <span class="nf">isClose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">trackedObject</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks for object distance</span>
+<span class="sd">        </span>
+<span class="sd">        Takes in the tracked object and compares it width and height</span>
+<span class="sd">        to the minimum required for detection.If this is met its area</span>
+<span class="sd">        of the screen will be appended and true will be returned.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            arg1:   tracked object to compare</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            True or False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;to&quot;</span><span class="p">,</span><span class="n">trackedObject</span><span class="p">)</span>
+        <span class="n">centerPos</span> <span class="o">=</span> <span class="n">trackedObject</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">trackedObject</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span><span class="n">trackedObject</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alertItemPos</span> <span class="o">=</span> <span class="n">centerPos</span>
+        <span class="n">objectName</span> <span class="o">=</span> <span class="n">trackedObject</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">objWidth</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">trackedObject</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">trackedObject</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">objHeight</span> <span class="o">=</span> <span class="n">trackedObject</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">close</span> <span class="o">=</span> <span class="kc">False</span>
+        
+        <span class="k">if</span><span class="p">(</span><span class="n">objectName</span> <span class="o">==</span> <span class="s1">&#39;bollard&#39;</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">objWidth</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">bollardWidth</span> <span class="ow">and</span> <span class="n">objHeight</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">bollardHeight</span><span class="p">):</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trackedObject</span><span class="p">)</span> <span class="o">==</span><span class="mi">5</span><span class="p">):</span> 
+                    <span class="n">close</span> <span class="o">=</span> <span class="kc">True</span>
+        
+        <span class="k">elif</span><span class="p">(</span><span class="n">objectName</span> <span class="o">==</span> <span class="s1">&#39;Construction-sign&#39;</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">objWidth</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">constructionSignWidth</span><span class="p">):</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trackedObject</span><span class="p">)</span> <span class="o">==</span><span class="mi">5</span><span class="p">):</span> 
+                    <span class="n">close</span> <span class="o">=</span> <span class="kc">True</span>
+            
+            
+        <span class="k">elif</span><span class="p">(</span><span class="n">objectName</span> <span class="o">==</span> <span class="s1">&#39;Construction-barrier&#39;</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">objHeight</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">constructionBarrierHeight</span> <span class="ow">and</span> <span class="n">objWidth</span> <span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">constructionBarrierWidth</span><span class="p">):</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trackedObject</span><span class="p">)</span> <span class="o">==</span><span class="mi">5</span><span class="p">):</span> 
+                    <span class="n">close</span> <span class="o">=</span> <span class="kc">True</span>
+                    
+        <span class="k">elif</span><span class="p">(</span><span class="n">objectName</span> <span class="o">==</span> <span class="s1">&#39;cone&#39;</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">objWidth</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">coneWidth</span><span class="p">):</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trackedObject</span><span class="p">)</span> <span class="o">==</span><span class="mi">5</span><span class="p">):</span> 
+                    <span class="n">close</span> <span class="o">=</span> <span class="kc">True</span>
+             
+        <span class="k">elif</span><span class="p">(</span><span class="n">objectName</span> <span class="o">==</span> <span class="s1">&#39;bin&#39;</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">objWidth</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">binWidth</span> <span class="p">):</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trackedObject</span><span class="p">)</span> <span class="o">==</span><span class="mi">5</span><span class="p">):</span> 
+                    <span class="n">close</span> <span class="o">=</span> <span class="kc">True</span>
+            
+        <span class="k">elif</span><span class="p">(</span><span class="n">objectName</span> <span class="o">==</span> <span class="s1">&#39;car&#39;</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">objWidth</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">carWidth</span><span class="p">):</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trackedObject</span><span class="p">)</span> <span class="o">==</span><span class="mi">5</span><span class="p">):</span>
+                    <span class="n">close</span> <span class="o">=</span> <span class="kc">True</span>
+       
+        <span class="k">elif</span><span class="p">(</span><span class="n">objectName</span> <span class="o">==</span> <span class="s1">&#39;puddle&#39;</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">objHeight</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">puddleHeight</span> <span class="ow">and</span> <span class="n">objWidth</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">puddleWidth</span><span class="p">):</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trackedObject</span><span class="p">)</span> <span class="o">==</span><span class="mi">5</span><span class="p">):</span>
+                    <span class="n">close</span> <span class="o">=</span> <span class="kc">True</span>
+        
+        <span class="k">elif</span><span class="p">(</span><span class="n">objectName</span> <span class="o">==</span> <span class="s1">&#39;street-pole&#39;</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">objHeight</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">streetPoleHeight</span> <span class="ow">and</span> <span class="n">objWidth</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">streetPoleWidth</span><span class="p">):</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trackedObject</span><span class="p">)</span> <span class="o">==</span><span class="mi">5</span><span class="p">):</span> 
+                    <span class="n">close</span> <span class="o">=</span> <span class="kc">True</span>
+            
+        <span class="k">elif</span><span class="p">(</span><span class="n">objectName</span> <span class="o">==</span> <span class="s1">&#39;street-sign&#39;</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">objHeight</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">streetSignHeight</span> <span class="ow">and</span> <span class="n">objWidth</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">streetSignWidth</span><span class="p">):</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trackedObject</span><span class="p">)</span> <span class="o">==</span><span class="mi">5</span><span class="p">):</span> 
+                    <span class="n">close</span> <span class="o">=</span> <span class="kc">True</span>
+                    
+        <span class="k">elif</span><span class="p">(</span><span class="n">objectName</span> <span class="o">==</span> <span class="s1">&#39;tree&#39;</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">objHeight</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">treeHeight</span> <span class="ow">and</span> <span class="n">objWidth</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">treeWidth</span><span class="p">):</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trackedObject</span><span class="p">)</span> <span class="o">==</span><span class="mi">5</span><span class="p">):</span> 
+                    <span class="n">close</span> <span class="o">=</span> <span class="kc">True</span>
+        
+        <span class="k">if</span><span class="p">(</span><span class="n">close</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;center Position =&quot;</span><span class="p">,</span> <span class="n">centerPos</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">centerPos</span> <span class="o">&lt;=</span> <span class="mi">180</span> <span class="p">):</span>
+                <span class="n">trackedObject</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+            
+            <span class="k">if</span><span class="p">(</span><span class="n">centerPos</span> <span class="o">&gt;</span> <span class="mi">180</span>  <span class="ow">and</span> <span class="n">centerPos</span> <span class="o">&lt;</span><span class="mi">460</span><span class="p">):</span>
+                <span class="n">trackedObject</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;forward&quot;</span><span class="p">)</span>
+            
+            <span class="k">elif</span><span class="p">(</span><span class="n">centerPos</span> <span class="o">&gt;=</span> <span class="mi">460</span><span class="p">):</span>
+                <span class="n">trackedObject</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div></div>
+                     
+    
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">ps</span> <span class="o">=</span> <span class="n">ODVI</span><span class="p">()</span>
+    <span class="n">ps</span><span class="o">.</span><span class="n">detectAndTrack</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span><span class="s2">&quot;2&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, James Corbett.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
